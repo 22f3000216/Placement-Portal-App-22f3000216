@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h5 class="mb-4">Edit Drive</h5>
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Job Title</label>
+                        <input type="text" name="job_title" class="form-control" value="{{ drive.job_title }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Job Description</label>
+                        <textarea name="description" class="form-control" rows="4">{{ drive.description }}</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Eligibility Criteria</label>
+                        <input type="text" name="eligibility" class="form-control" value="{{ drive.eligibility }}">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Salary</label>
+                            <input type="text" name="salary" class="form-control" value="{{ drive.salary }}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Location</label>
+                            <input type="text" name="location" class="form-control" value="{{ drive.location }}">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Deadline</label>
+                        <input type="datetime-local" name="deadline" class="form-control" value="{{ drive.deadline.strftime('%Y-%m-%dT%H:%M') }}" required>
+                    </div>
+                    <button type="submit" class="btn btn-dark w-100">Update Drive</button>
+                </form>
+                <a href="{{ url_for('company_dashboard') }}" class="btn btn-outline-secondary w-100 mt-2">Cancel</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

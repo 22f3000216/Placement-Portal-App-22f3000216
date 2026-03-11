@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3>Welcome, {{ user.name }}</h3>
+        <p class="text-muted mb-0">Roll: {{ student.roll_no }} | {{ student.department }} | CGPA: {{ student.cgpa }}</p>
+    </div>
+    <div>
+        <a href="{{ url_for('edit_profile') }}" class="btn btn-outline-dark me-2">Edit Profile</a>
+        <a href="{{ url_for('student_history') }}" class="btn btn-outline-secondary me-2">My History</a>
+        <a href="{{ url_for('student_search') }}" class="btn btn-outline-primary">Search Drives</a>
+    </div>
+</div>
+
+<h5 class="mt-3">Available Placement Drives</h5>
+<div class="row">
+    {% for drive in available_drives %}
+    <div class="col-md-6 mb-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h6 class="fw-bold">{{ drive.job_title }}</h6>
+                <p class="mb-1 text-muted">{{ drive.company.company_name }}</p>
+                <p class="mb-1">Location: {{ drive.location }} | Salary: {{ drive.salary }}</p>
+                <p class="mb-1 small">Eligibility: {{ drive.eligibility }}</p>
+                <p class="mb-2 small text-danger">Deadline: {{ drive.deadline.strftime('%d-%m-%Y') }}</p>
+                {% if drive.id in applied_drive_ids %}
+                <button class="btn btn-sm btn-success" disabled>Already Applied</button>
+                {% else %}
+                <form method="POST" action="{{ url_for('apply_drive', id=drive.id) }}" style="display:inline">
+                    <button type="submit" class="btn btn-sm btn-dark">Apply Now</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12">
+        <p class="text-muted">No drives available right now</p>
+    </div>
+    {% endfor %}
+</div>
+
+<h5 class="mt-4">Registered Companies</h5>
+<table class="table table-bordered table-sm">
+    <thead class="table-dark">
+        <tr><th>Company</th><th>HR Contact</th><th>Website</th><th>About</th></tr>
+    </thead>
+    <tbody>
+        {% for company in all_companies %}
+        <tr>
+            <td>{{ company.company_name }}</td>
+            <td>{{ company.hr_contact }}</td>
+            <td><a href="{{ company.website }}" target="_blank">{{ company.website }}</a></td>
+            <td>{{ (company.description or '')[:80] }}...</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="text-center">No companies yet</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h5 class="mt-4">My Applications</h5>
+<table class="table table-bordered table-sm">
+    <thead class="table-dark">
+        <tr><th>#</th><th>Drive</th><th>Company</th><th>Applied On</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+        {% for application in my_applications %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ application.drive.job_title }}</td>
+            <td>{{ application.drive.company.company_name }}</td>
+            <td>{{ application.applied_on.strftime('%d-%m-%Y') }}</td>
+            <td>
+                {% if application.status == 'selected' %}
+                <span class="badge bg-success">Selected</span>
+                {% elif application.status == 'shortlisted' %}
+                <span class="badge bg-primary">Shortlisted</span>
+                {% elif application.status == 'waiting' %}
+                <span class="badge bg-warning text-dark">Waiting</span>
+                {% elif application.status == 'rejected' %}
+                <span class="badge bg-danger">Rejected</span>
+                {% else %}
+                <span class="badge bg-secondary">Applied</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="text-center">You have not applied to any drive yet</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

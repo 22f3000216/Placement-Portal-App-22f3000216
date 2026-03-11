@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3>Welcome, {{ company.company_name }}</h3>
+        <p class="text-muted mb-0">HR: {{ company.hr_contact }} | {{ company.website }}</p>
+    </div>
+    <a href="{{ url_for('create_drive') }}" class="btn btn-dark">+ Create New Drive</a>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-white bg-primary text-center p-3">
+            <h3>{{ total_drives }}</h3>
+            <p class="mb-0">Total Drives</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-success text-center p-3">
+            <h3>{{ ongoing_drives | length }}</h3>
+            <p class="mb-0">Ongoing Drives</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-secondary text-center p-3">
+            <h3>{{ total_applications }}</h3>
+            <p class="mb-0">Total Applications</p>
+        </div>
+    </div>
+</div>
+
+{% if pending_drives %}
+<h5 class="mt-3">Pending Approval</h5>
+<table class="table table-bordered">
+    <thead class="table-warning">
+        <tr><th>Job Title</th><th>Location</th><th>Deadline</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+        {% for drive in pending_drives %}
+        <tr>
+            <td>{{ drive.job_title }}</td>
+            <td>{{ drive.location }}</td>
+            <td>{{ drive.deadline.strftime('%d-%m-%Y') }}</td>
+            <td>
+                <a href="{{ url_for('edit_drive', id=drive.id) }}" class="btn btn-sm btn-outline-dark">Edit</a>
+                <a href="{{ url_for('delete_drive', id=drive.id) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this drive?')">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+{% if approved_drives %}
+<h5 class="mt-3">Approved Drives (Not Started)</h5>
+<table class="table table-bordered">
+    <thead class="table-success">
+        <tr><th>Job Title</th><th>Location</th><th>Salary</th><th>Deadline</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+        {% for drive in approved_drives %}
+        <tr>
+            <td>{{ drive.job_title }}</td>
+            <td>{{ drive.location }}</td>
+            <td>{{ drive.salary }}</td>
+            <td>{{ drive.deadline.strftime('%d-%m-%Y') }}</td>
+            <td>
+                <a href="{{ url_for('start_drive', id=drive.id) }}" class="btn btn-sm btn-success">Start Drive</a>
+                <a href="{{ url_for('view_applications', id=drive.id) }}" class="btn btn-sm btn-info">Applications</a>
+                <a href="{{ url_for('edit_drive', id=drive.id) }}" class="btn btn-sm btn-outline-dark">Edit</a>
+                <a href="{{ url_for('delete_drive', id=drive.id) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete?')">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+{% if ongoing_drives %}
+<h5 class="mt-3">Ongoing Drives</h5>
+<table class="table table-bordered">
+    <thead class="table-primary">
+        <tr><th>Job Title</th><th>Location</th><th>Applications</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+        {% for drive in ongoing_drives %}
+        <tr>
+            <td>{{ drive.job_title }}</td>
+            <td>{{ drive.location }}</td>
+            <td>{{ drive.applications | length }}</td>
+            <td>
+                <a href="{{ url_for('view_applications', id=drive.id) }}" class="btn btn-sm btn-info">View Applications</a>
+                <a href="{{ url_for('close_drive', id=drive.id) }}" class="btn btn-sm btn-secondary">Close Drive</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+{% if closed_drives %}
+<h5 class="mt-3">Closed Drives</h5>
+<table class="table table-bordered">
+    <thead class="table-secondary">
+        <tr><th>Job Title</th><th>Location</th><th>Applications</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+        {% for drive in closed_drives %}
+        <tr>
+            <td>{{ drive.job_title }}</td>
+            <td>{{ drive.location }}</td>
+            <td>{{ drive.applications | length }}</td>
+            <td>
+                <a href="{{ url_for('view_applications', id=drive.id) }}" class="btn btn-sm btn-outline-dark">View Applications</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+{% endblock %}

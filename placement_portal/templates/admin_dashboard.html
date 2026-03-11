@@ -1,0 +1,254 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3 class="mb-4">Admin Dashboard</h3>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary text-center p-3">
+            <h2>{{ all_students | length }}</h2>
+            <p class="mb-0">Students</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success text-center p-3">
+            <h2>{{ all_companies | length }}</h2>
+            <p class="mb-0">Companies</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning text-center p-3">
+            <h2>{{ all_drives | length }}</h2>
+            <p class="mb-0">Drives</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-secondary text-center p-3">
+            <h2>{{ all_applications | length }}</h2>
+            <p class="mb-0">Applications</p>
+        </div>
+    </div>
+</div>
+
+<form class="d-flex gap-2 mb-4" method="GET" action="{{ url_for('admin_search') }}">
+    <input type="text" name="q" class="form-control" placeholder="Search students or companies...">
+    <button type="submit" class="btn btn-dark">Search</button>
+</form>
+
+<h5 class="mt-3">All Companies</h5>
+<div class="table-responsive">
+<table class="table table-bordered table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>#</th>
+            <th>Company Name</th>
+            <th>HR Contact</th>
+            <th>Website</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for company in all_companies %}
+        <tr>
+            <td>{{ company.id }}</td>
+            <td>{{ company.company_name }}</td>
+            <td>{{ company.hr_contact }}</td>
+            <td><a href="{{ company.website }}" target="_blank">{{ company.website }}</a></td>
+            <td>
+                {% if company.status == 'approved' %}
+                <span class="badge bg-success">Approved</span>
+                {% elif company.status == 'pending' %}
+                <span class="badge bg-warning text-dark">Pending</span>
+                {% elif company.status == 'blacklisted' %}
+                <span class="badge bg-dark">Blacklisted</span>
+                {% else %}
+                <span class="badge bg-danger">Rejected</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if company.status == 'pending' %}
+                <a href="{{ url_for('approve_company', id=company.id) }}" class="btn btn-sm btn-success">Approve</a>
+                <a href="{{ url_for('reject_company', id=company.id) }}" class="btn btn-sm btn-danger">Reject</a>
+                {% endif %}
+                {% if company.status != 'blacklisted' %}
+                <a href="{{ url_for('blacklist_company', id=company.id) }}" class="btn btn-sm btn-warning" onclick="return confirm('Blacklist this company?')">Blacklist</a>
+                {% endif %}
+                <a href="{{ url_for('delete_company', id=company.id) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this company?')">Delete</a>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="text-center">No companies found</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+<h5 class="mt-4">All Students</h5>
+<div class="table-responsive">
+<table class="table table-bordered table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Roll No</th>
+            <th>Department</th>
+            <th>CGPA</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for student in all_students %}
+        <tr>
+            <td>{{ student.id }}</td>
+            <td>{{ student.user.name }}</td>
+            <td>{{ student.roll_no }}</td>
+            <td>{{ student.department }}</td>
+            <td>{{ student.cgpa }}</td>
+            <td>
+                {% if student.is_blacklisted %}
+                <span class="badge bg-danger">Blacklisted</span>
+                {% else %}
+                <span class="badge bg-success">Active</span>
+                {% endif %}
+            </td>
+            <td>
+                <form method="POST" action="{{ url_for('blacklist_student', id=student.id) }}" style="display:inline">
+                    <button class="btn btn-sm btn-warning">
+                        {% if student.is_blacklisted %}Unblock{% else %}Blacklist{% endif %}
+                    </button>
+                </form>
+                <a href="{{ url_for('edit_student', id=student.id) }}" class="btn btn-sm btn-info">Edit</a>
+                <a href="{{ url_for('delete_student', id=student.id) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete student?')">Delete</a>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="text-center">No students found</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+<h5 class="mt-4">Drives Waiting for Approval</h5>
+<div class="table-responsive">
+<table class="table table-bordered table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>#</th>
+            <th>Company</th>
+            <th>Job Title</th>
+            <th>Deadline</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for drive in pending_drives %}
+        <tr>
+            <td>{{ drive.id }}</td>
+            <td>{{ drive.company.company_name }}</td>
+            <td>{{ drive.job_title }}</td>
+            <td>{{ drive.deadline.strftime('%d-%m-%Y') }}</td>
+            <td>
+                <a href="{{ url_for('approve_drive', id=drive.id) }}" class="btn btn-sm btn-success">Approve</a>
+                <a href="{{ url_for('reject_drive', id=drive.id) }}" class="btn btn-sm btn-danger">Reject</a>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="text-center">No pending drives</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+<h5 class="mt-4">Approved Drives (Not Started Yet)</h5>
+<div class="table-responsive">
+<table class="table table-bordered table-hover">
+    <thead class="table-success">
+        <tr>
+            <th>#</th>
+            <th>Company</th>
+            <th>Job Title</th>
+            <th>Location</th>
+            <th>Deadline</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for drive in approved_drives %}
+        <tr>
+            <td>{{ drive.id }}</td>
+            <td>{{ drive.company.company_name }}</td>
+            <td>{{ drive.job_title }}</td>
+            <td>{{ drive.location }}</td>
+            <td>{{ drive.deadline.strftime('%d-%m-%Y') }}</td>
+            <td>
+                <a href="{{ url_for('close_drive_admin', id=drive.id) }}" class="btn btn-sm btn-secondary">Close</a>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="text-center">No approved drives</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+<h5 class="mt-4">Ongoing Drives</h5>
+<div class="table-responsive">
+<table class="table table-bordered table-hover">
+    <thead class="table-primary">
+        <tr>
+            <th>#</th>
+            <th>Company</th>
+            <th>Job Title</th>
+            <th>Applications</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for drive in ongoing_drives %}
+        <tr>
+            <td>{{ drive.id }}</td>
+            <td>{{ drive.company.company_name }}</td>
+            <td>{{ drive.job_title }}</td>
+            <td>{{ drive.applications | length }}</td>
+            <td>
+                <a href="{{ url_for('close_drive_admin', id=drive.id) }}" class="btn btn-sm btn-secondary">Mark Complete</a>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="text-center">No ongoing drives</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+<h5 class="mt-4">Recent Applications</h5>
+<div class="table-responsive">
+<table class="table table-bordered table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>Student</th>
+            <th>Roll No</th>
+            <th>Drive</th>
+            <th>Company</th>
+            <th>Status</th>
+            <th>Applied On</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for application in recent_applications %}
+        <tr>
+            <td>{{ application.student.user.name }}</td>
+            <td>{{ application.student.roll_no }}</td>
+            <td>{{ application.drive.job_title }}</td>
+            <td>{{ application.drive.company.company_name }}</td>
+            <td><span class="badge bg-secondary">{{ application.status }}</span></td>
+            <td>{{ application.applied_on.strftime('%d-%m-%Y') }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="text-center">No applications yet</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}

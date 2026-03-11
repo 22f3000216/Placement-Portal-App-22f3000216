@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block content %}
+<h4>My Application History</h4>
+<a href="{{ url_for('student_dashboard') }}" class="btn btn-sm btn-outline-dark mb-3">Back to Dashboard</a>
+
+<table class="table table-bordered table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>Drive #</th>
+            <th>Job Title</th>
+            <th>Company</th>
+            <th>Location</th>
+            <th>Applied On</th>
+            <th>Result</th>
+            <th>Remarks</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for application in my_applications %}
+        <tr>
+            <td>{{ application.drive.id }}</td>
+            <td>{{ application.drive.job_title }}</td>
+            <td>{{ application.drive.company.company_name }}</td>
+            <td>{{ application.drive.location }}</td>
+            <td>{{ application.applied_on.strftime('%d-%m-%Y') }}</td>
+            <td>
+                {% if application.status == 'selected' %}
+                <span class="badge bg-success">Selected</span>
+                {% elif application.status == 'shortlisted' %}
+                <span class="badge bg-primary">Shortlisted</span>
+                {% elif application.status == 'waiting' %}
+                <span class="badge bg-warning text-dark">Waiting</span>
+                {% elif application.status == 'rejected' %}
+                <span class="badge bg-danger">Rejected</span>
+                {% else %}
+                <span class="badge bg-secondary">Applied</span>
+                {% endif %}
+            </td>
+            <td>{{ application.remarks or '-' }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="text-center">No application history</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

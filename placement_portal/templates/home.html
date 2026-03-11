@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="text-center mt-5">
+    <h1 class="fw-bold">Welcome to Placement Portal</h1>
+    <p class="lead text-muted mt-2">Connecting students with companies for placement drives</p>
+    <div class="mt-4">
+        <a href="{{ url_for('login') }}" class="btn btn-dark btn-lg me-2">Login</a>
+        <a href="{{ url_for('student_register') }}" class="btn btn-outline-dark btn-lg me-2">Student Register</a>
+        <a href="{{ url_for('company_register') }}" class="btn btn-outline-secondary btn-lg">Company Register</a>
+    </div>
+</div>
+{% endblock %}

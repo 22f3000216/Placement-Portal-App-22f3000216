@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+<h4>Search Drives</h4>
+<form method="GET" class="d-flex gap-2 mb-4">
+    <input type="text" name="q" class="form-control" placeholder="Search by job title or location..." value="{{ q }}">
+    <button type="submit" class="btn btn-dark">Search</button>
+</form>
+<a href="{{ url_for('student_dashboard') }}" class="btn btn-sm btn-outline-secondary mb-3">Back to Dashboard</a>
+
+{% if results %}
+<div class="row">
+    {% for drive in results %}
+    <div class="col-md-6 mb-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h6 class="fw-bold">{{ drive.job_title }}</h6>
+                <p class="mb-1 text-muted">{{ drive.company.company_name }}</p>
+                <p class="mb-1">Location: {{ drive.location }} | Salary: {{ drive.salary }}</p>
+                <p class="mb-1 small">Eligibility: {{ drive.eligibility }}</p>
+                <p class="mb-2 small text-danger">Deadline: {{ drive.deadline.strftime('%d-%m-%Y') }}</p>
+                {% if drive.id in applied_drive_ids %}
+                <button class="btn btn-sm btn-success" disabled>Already Applied</button>
+                {% else %}
+                <form method="POST" action="{{ url_for('apply_drive', id=drive.id) }}" style="display:inline">
+                    <button type="submit" class="btn btn-sm btn-dark">Apply Now</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% elif q %}
+<p class="text-muted">No drives found for "{{ q }}"</p>
+{% endif %}
+{% endblock %}

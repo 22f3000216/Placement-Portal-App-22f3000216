@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h5 class="mb-4">Edit My Profile</h5>
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" name="name" class="form-control" value="{{ user.name }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Phone</label>
+                        <input type="text" name="phone" class="form-control" value="{{ user.phone or '' }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Department</label>
+                        <input type="text" name="department" class="form-control" value="{{ student.department or '' }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">CGPA</label>
+                        <input type="number" step="0.01" name="cgpa" class="form-control" value="{{ student.cgpa or '' }}" min="0" max="10">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Skills</label>
+                        <input type="text" name="skills" class="form-control" value="{{ student.skills or '' }}">
+                    </div>
+                    <button type="submit" class="btn btn-dark w-100">Save Profile</button>
+                </form>
+                <a href="{{ url_for('student_dashboard') }}" class="btn btn-outline-secondary w-100 mt-2">Cancel</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

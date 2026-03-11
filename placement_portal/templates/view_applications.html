@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block content %}
+<h4>Applications for: {{ drive.job_title }}</h4>
+<p class="text-muted">{{ drive.company.company_name }} | {{ drive.location }} | Status: {{ drive.status }}</p>
+<a href="{{ url_for('company_dashboard') }}" class="btn btn-sm btn-outline-dark mb-3">Back to Dashboard</a>
+
+<table class="table table-bordered table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>#</th>
+            <th>Student Name</th>
+            <th>Roll No</th>
+            <th>Department</th>
+            <th>CGPA</th>
+            <th>Skills</th>
+            <th>Applied On</th>
+            <th>Status</th>
+            <th>Update</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for application in applications %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ application.student.user.name }}</td>
+            <td>{{ application.student.roll_no }}</td>
+            <td>{{ application.student.department }}</td>
+            <td>{{ application.student.cgpa }}</td>
+            <td>{{ application.student.skills }}</td>
+            <td>{{ application.applied_on.strftime('%d-%m-%Y') }}</td>
+            <td>
+                {% if application.status == 'selected' %}
+                <span class="badge bg-success">Selected</span>
+                {% elif application.status == 'shortlisted' %}
+                <span class="badge bg-primary">Shortlisted</span>
+                {% elif application.status == 'waiting' %}
+                <span class="badge bg-warning text-dark">Waiting</span>
+                {% elif application.status == 'rejected' %}
+                <span class="badge bg-danger">Rejected</span>
+                {% else %}
+                <span class="badge bg-secondary">Applied</span>
+                {% endif %}
+            </td>
+            <td>
+                <form method="POST" action="{{ url_for('update_application', id=application.id) }}" class="d-flex gap-1">
+                    <select name="status" class="form-select form-select-sm">
+                        <option value="applied" {% if application.status == 'applied' %}selected{% endif %}>Applied</option>
+                        <option value="shortlisted" {% if application.status == 'shortlisted' %}selected{% endif %}>Shortlisted</option>
+                        <option value="waiting" {% if application.status == 'waiting' %}selected{% endif %}>Waiting</option>
+                        <option value="selected" {% if application.status == 'selected' %}selected{% endif %}>Selected</option>
+                        <option value="rejected" {% if application.status == 'rejected' %}selected{% endif %}>Rejected</option>
+                    </select>
+                    <button type="submit" class="btn btn-sm btn-dark">Save</button>
+                </form>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="9" class="text-center">No applications yet</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
